@@ -33,4 +33,6 @@ README
 t/01basic.t
 t/02rolestuff.t
 t/03noconflicts.t
+t/04requires.t
+t/05combination.t
 SIGNATURE                                Public-key signature (added by MakeMaker)

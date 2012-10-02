@@ -76,7 +76,9 @@ DESCRIPTION
 
     "apply_all_ersatz_methods_to_class($class)"
         Given a Moose::Meta::Class object, iterates through
-        "all_ersatz_methods" applying each to the class.
+        "all_ersatz_methods" applying each to the class. This procedure
+        skips any ersatz method for which this role can provide a real
+        method.
 
   MooseX::ErsatzMethod::Meta::Method
     Instances of this class represent an ersatz method.
@@ -97,6 +99,10 @@ DESCRIPTION
         Given a Moose::Meta::Class object, installs this method into the
         class unless the class (or a superclass) already has a method of
         that name.
+
+CAVEATS
+      with 'Role1';  with 'Role2';   # No!
+      with qw( Role1 Role2 );        # Yes
 
 BUGS
     Please report any bugs to

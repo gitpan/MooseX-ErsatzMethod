@@ -7,7 +7,7 @@ use utf8;
 
 BEGIN {
 	$MooseX::ErsatzMethod::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::ErsatzMethod::VERSION   = '0.001';
+	$MooseX::ErsatzMethod::VERSION   = '0.002';
 }
 
 my %METAROLES;
@@ -54,7 +54,7 @@ BEGIN {
 	package MooseX::ErsatzMethod::Trait::Role;
 	no thanks;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use Moose::Role;
 	has ersatz_methods => (
 		traits     => ['Hash'],
@@ -75,7 +75,11 @@ BEGIN {
 	sub apply_all_ersatz_methods_to_class
 	{
 		my ($self, $class) = @_;
-		$_->apply_to_class($class) for $self->all_ersatz_methods;
+		for ($self->all_ersatz_methods)
+		{
+			next if $self->has_method($_->name);
+			$_->apply_to_class($class);
+		}
 	}
 	sub composition_class_roles
 	{
@@ -87,7 +91,7 @@ BEGIN {
 	package MooseX::ErsatzMethod::Trait::Composite;
 	no thanks;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use Moose::Role;
 	with qw(MooseX::ErsatzMethod::Trait::Role);
 	around apply_params => sub
@@ -121,7 +125,7 @@ BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToClass;
 	no thanks;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use Moose::Role;
 	before apply => sub
 	{
@@ -138,7 +142,7 @@ BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToRole;
 	no thanks;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use Moose::Role;
 	before apply => sub
 	{
@@ -155,7 +159,7 @@ BEGIN {
 	package MooseX::ErsatzMethod::Trait::ApplicationToInstance;
 	no thanks;
 	our $AUTHORITY = 'cpan:TOBYINK';
-	our $VERSION   = '0.001';
+	our $VERSION   = '0.002';
 	use Moose::Role;
 };
 
@@ -282,7 +286,8 @@ object and adds it to the C<ersatz_methods> hash.
 =item C<< apply_all_ersatz_methods_to_class($class) >>
 
 Given a Moose::Meta::Class object, iterates through C<all_ersatz_methods>
-applying each to the class.
+applying each to the class. This procedure skips any ersatz method for which
+this role can provide a real method.
 
 =back
 
@@ -314,6 +319,11 @@ Given a Moose::Meta::Class object, installs this method into the class
 unless the class (or a superclass) already has a method of that name.
 
 =back
+
+=head1 CAVEATS
+
+  with 'Role1';  with 'Role2';   # No!
+  with qw( Role1 Role2 );        # Yes
 
 =head1 BUGS
 
